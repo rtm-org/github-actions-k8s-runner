@@ -18,7 +18,6 @@ jobs:
         uses: azure/setup-kubectl@v4
         with:
           version: latest
-        id: install
 
       - name: Set Kubeconfig Context
         uses: azure/k8s-set-context@v4
@@ -31,4 +30,13 @@ jobs:
             kubectl version
             echo ----------------------------------------------------
             kubectl get nodes
+      
+      - name: Install Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: v3.13.3
+
+      - name: Check Helm Version
+        run: helm version
+          
 
