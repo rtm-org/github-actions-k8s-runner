@@ -1,0 +1,8 @@
+ apiVersion: actions.summerwind.dev/v1alpha1
+ kind: Runner
+ metadata:
+   name: actions-runner
+   namespace: runner-system
+ spec:
+  spec:
+    repository: rtm-org/hng_boilerplate_expressjs

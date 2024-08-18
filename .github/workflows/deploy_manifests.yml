@@ -61,4 +61,7 @@ jobs:
               --set githubConfigSecret=${{ vars.NAMESPACE }} \
               --set syncPeriod=1m
 
+      - name: Deploy Runner Manifests
+        run: kubectl apply -f manifests/*yaml
+
 
