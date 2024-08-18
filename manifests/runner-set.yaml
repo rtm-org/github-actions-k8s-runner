@@ -8,9 +8,12 @@ metadata:
 
 ---
 apiVersion: actions.summerwind.dev/v1alpha1
-kind: Runner
+kind: AutoscalingRunnerSet
 metadata:
   name: actions-runner
   namespace: runner-system
 spec:
-  repository: rtm-org/hng_boilerplate_expressjs
+  githubConfigUrl: rtm-org/hng_boilerplate_expressjs
+  githubConfigSecret: runner-controller-manager
+  minRunners: 0
+  maxRunners: 20
