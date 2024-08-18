@@ -38,7 +38,11 @@ jobs:
 
       - name: Check Helm Version
         run: helm version
-        
+      
+      - name: Create Namespace
+        run: |
+          kubectl create namespace ${{ vars.NAMESPACE }}
+      
       - name: Register GitHub App Info as Secret
         run: |
           kubectl create secret generic runner-controller-manager \
