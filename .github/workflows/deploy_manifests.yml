@@ -41,7 +41,7 @@ jobs:
       
       - name: Create Namespace
         run: |
-          kubectl create namespace ${{ vars.NAMESPACE }}
+          kubectl get namespace ${{ vars.NAMESPACE }} || kubectl create namespace ${{ vars.NAMESPACE }}
       
       - name: Register GitHub App Info as Secret
         run: |
