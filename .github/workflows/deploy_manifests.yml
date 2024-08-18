@@ -2,9 +2,9 @@ name: Deploy Manifests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
   workflow_dispatch:
 
@@ -27,10 +27,10 @@ jobs:
 
       - name: Fetch Cluster Details
         run: |
-            kubectl version
-            echo ----------------------------------------------------
-            kubectl get nodes
-      
+          kubectl version
+          echo ----------------------------------------------------
+          kubectl get nodes
+
       - name: Install Helm
         uses: azure/setup-helm@v4.2.0
         with:
@@ -38,11 +38,11 @@ jobs:
 
       - name: Check Helm Version
         run: helm version
-      
+
       - name: Create Namespace
         run: |
           kubectl get namespace ${{ vars.NAMESPACE }} || kubectl create namespace ${{ vars.NAMESPACE }}
-      
+
       - name: Register GitHub App Info as Secret
         run: |
           kubectl get secret runner-controller-manager --namespace=${{ vars.NAMESPACE }} && \
@@ -53,12 +53,11 @@ jobs:
             --from-literal=github_app_id=${{ secrets.APP_ID }} \
             --from-literal=github_app_installation_id=${{ secrets.APP_INSTALLATION_ID }} \
             --from-literal=github_app_private_key="${{ secrets.APP_KEY }}"
-      
 
       - name: Install Actions Runner Controller
         run: |
           if helm list --namespace ${{ vars.NAMESPACE }} | grep -q '^arc'; then
-            helm upgrade arc ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+            helm upgrade arc ci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
             --namespace actions-runner-system  
 
           else
@@ -72,5 +71,3 @@ jobs:
 
       - name: Deploy Runner Manifests
         run: kubectl apply -f manifests/*yaml
-
-
