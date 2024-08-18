@@ -45,7 +45,8 @@ jobs:
             --namespace=${{ vars.NAMESPACE }} \
             --from-literal=github_app_id=${{ secrets.APP_ID }} \
             --from-literal=github_app_installation_id=${{ secrets.APP_INSTALLATION_ID }} \
-            --from-literal=github_app_private_key=${{ secrets.APP_KEY}}
+            --from-literal=github_app_private_key="${{ secrets.APP_KEY }}"
+      
 
       - name: Install Actions Runner Controller
         run: |
