@@ -71,4 +71,4 @@ jobs:
           fi
 
       - name: Deploy Runner Manifests
-        run: kubectl apply -f manifests/*yaml
+        run: kubectl apply -f manifests/
