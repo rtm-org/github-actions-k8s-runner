@@ -57,8 +57,9 @@ jobs:
       - name: Install Actions Runner Controller
         run: |
           if helm list --namespace ${{ vars.NAMESPACE }} | grep -q '^arc'; then
-            helm upgrade arc ci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
-            --namespace actions-runner-system  
+            helm upgrade arc \
+            oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+            --namespace ${{ vars.NAMESPACE }} 
 
           else
             helm install arc \
