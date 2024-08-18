@@ -45,6 +45,9 @@ jobs:
       
       - name: Register GitHub App Info as Secret
         run: |
+          kubectl get secret runner-controller-manager --namespace=${{ vars.NAMESPACE }} && \
+          kubectl delete secret runner-controller-manager --namespace=${{ vars.NAMESPACE }}
+
           kubectl create secret generic runner-controller-manager \
             --namespace=${{ vars.NAMESPACE }} \
             --from-literal=github_app_id=${{ secrets.APP_ID }} \
