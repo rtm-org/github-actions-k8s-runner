@@ -22,3 +22,22 @@ spec:
       containers:
       - name: runner
         image: ghcr.io/actions/actions-runner:latest
+        env:
+        - name: RUNNER_ALLOW_RUNASROOT
+          value: "1"
+        - name: RUNNER_MANUALLY_TRAP_SIG
+          value: "true"
+        command: ["/runner/run.sh"]
+        volumeMounts:
+        - name: runner
+          mountPath: /runner
+      initContainers:
+        - name: setup
+          image: ghcr.io/actions/actions-runner:latest
+          command: ["sh", "-c", "cp -r /actions-runner/* /runner/"]
+          volumeMounts:
+          - name: runner
+            mountPath: /runner
+      volumes:
+        - name: runner
+          emptyDir: {}
