@@ -57,12 +57,18 @@ jobs:
 
       - name: Install Actions Runner Controller
         run: |
-          helm install arc \
-              --namespace "${{ vars.NAMESPACE }}" \
-              --create-namespace \
-              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
-              --set githubConfigSecret=${{ vars.NAMESPACE }} \
-              --set syncPeriod=1m
+          if helm list --namespace ${{ vars.NAMESPACE }} | grep -q '^arc'; then
+            helm upgrade arc ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+            --namespace actions-runner-system  
+
+          else
+            helm install arc \
+                --namespace "${{ vars.NAMESPACE }}" \
+                --create-namespace \
+                oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+                --set githubConfigSecret=${{ vars.NAMESPACE }} \
+                --set syncPeriod=1m
+          fi
 
       - name: Deploy Runner Manifests
         run: kubectl apply -f manifests/*yaml
