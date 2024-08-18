@@ -1,9 +1,17 @@
 ---
-apiVersion: actions.summerwind.dev/v1alpha1
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: runner-system
+  labels:
+    name: runner-system
+
+---
+apiVersion: actions.github.com/v1alpha1
 kind: AutoscalingRunnerSet
 metadata:
   name: actions-runner
-  namespace: actions-runner-system
+  namespace: runner-system
 spec:
   githubConfigUrl: rtm-org/hng_boilerplate_expressjs
   githubConfigSecret: runner-controller-manager
