@@ -17,3 +17,8 @@ spec:
   githubConfigSecret: runner-controller-manager
   minRunners: 0
   maxRunners: 20
+  template:
+    spec:
+      containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:latest
