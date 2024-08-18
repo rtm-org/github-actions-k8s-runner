@@ -5,7 +5,4 @@
 
 ## Connect github actions to your kubernetes cluster
 - I assume you already have a fork of this repo in your github account
-- Create new secrets in your forked repo with the following names:
-```
-KUBECONFIG
-```
+- Create a secret in your forked repo called `KUBECONFIG` and add your kube configs
