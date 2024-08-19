@@ -41,32 +41,28 @@ jobs:
 
       - name: Install Actions Runner Controller
         run: |
-          if helm list --namespace "${{ vars.CONTROL_NAMESPACE }}" | grep -q "^${{ vars.CONTROLLER_INSTALLATION_NAME }}"; then
-            helm upgrade "${{ vars.CONTROLLER_INSTALLATION_NAME }}" \
-              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
-              --namespace "${{ vars.CONTROL_NAMESPACE }}" \
-              --create-namespace \
-              -f controller/values.yaml
-          else
-            helm install "${{ vars.CONTROLLER_INSTALLATION_NAME }}" \
-              --namespace "${{ vars.CONTROL_NAMESPACE }}" \
-              --create-namespace \
-              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
-              -f controller/values.yaml
-          fi     
+          if helm list --namespace ${{ vars.NAMESPACE }} | grep -q '^arc'; then
+            helm upgrade arc \
+            oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+            --namespace ${{ vars.NAMESPACE }} 
 
-      - name: Install Runners
-        run: |
-          if helm list --namespace "${{ vars.NAMESPACE }}" | grep -q "^${{ vars.RUNNERS_INSTALLATION_NAME }}"; then
-            helm upgrade "${{ vars.RUNNERS_INSTALLATION_NAME }}" \
-              --namespace "${{ vars.NAMESPACE }}" \
-              --create-namespace \
-              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
-              -f runners/values.yaml
           else
-            helm install "${{ vars.RUNNERS_INSTALLATION_NAME }}" \
-              --namespace "${{ vars.NAMESPACE }}" \
-              --create-namespace \
-              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
-              -f runners/values.yaml
+            helm install arc \
+                --namespace "${{ vars.NAMESPACE }}" \
+                --create-namespace \
+                oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+                --set githubConfigSecret=runner-controller-manager \
+                --set syncPeriod=1m
           fi
+
+      # - name: Install runners
+      #   run: |
+      #     helm install "${{ INSTALLATION_NAME }}" \
+      #       --namespace "${{ vars.NAMESPACE }}" \
+      #       --create-namespace \
+      #       --set githubConfigUrl="${GITHUB_CONFIG_URL}" \
+      #       --set githubConfigSecret=runner-controller-manager \
+      #       oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+            
+      - name: Deploy Runner Manifests
+        run: kubectl apply -f manifests/
