@@ -34,3 +34,18 @@ To set up a GitHub App, you can either create an app in your personal account or
 10. On the creating page, locate the "Private Key" section and create a new key. This will download a .pem file to your local machine
 11. Next, on tha app menu, select the "Install App" page and install the app on the repository(ies) you want.
 
+### Register GitHub App Info as Secret
+Next, create a namespace in your kubernetes cluster. This namespace is where the "Action Runners" will be hosted.
+```
+kubectl create namespace ${NAMESPACE}
+```
+Then, create a secret in the namespace to hold the GitHub App info.
+```
+kubectl create secret generic runner-controller-manager \
+--namespace=${NAMESPACE} \
+--from-literal=github_app_id=${APP_ID} \
+--from-literal=github_app_installation_id=${APP_INSTALLATION_ID} \
+--from-literal=github_app_private_key="${APP_KEY}"
+```
+
+
