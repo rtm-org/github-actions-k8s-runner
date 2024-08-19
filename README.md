@@ -1,6 +1,7 @@
-# github-runner-manifests
+# Kubernetes-Based CI/CD Pipeline with Self-Hosted GitHub Actions Runners
+This project uses a workflow to deploy manifests to a Kubernetes cluster using Helm. The actions workflow is setup to connect to your cluster using the kube config and then it applies the manifest files to the cluster. The workflow is triggered on every push to the main branch or can be triggered manually using the workflow_dispatch event. Once the workflow runs, verify that the manifests were successfully applied by checking the state of your Kubernetes cluster.
 
-## Requirements
+### Requirements
 - Have an existing Kubernetes cluster or set up a new one using a service like Minikube (local), GKE, EKS, or AKS (cloud)
 - Have a repository that contains your application files
 
@@ -8,9 +9,7 @@
 - I assume you already have a fork of this repo in your github account
 - Create a secret in your forked repo called "KUBECONFIG" and add your kube configs
 
-The actions workflow is setup to connect to your cluster using the kube config and then it applies the manifest files to the cluster. The workflow is triggered on every push to the main branch or can be triggered manually using the workflow_dispatch event. Once the workflow runs, verify that the manifests were successfully applied by checking the state of your Kubernetes cluster.
-
-## Authenticating to the GitHub API
+### Authenticating to the GitHub API
 You can authenticate Actions Runner Controller (ARC) to the GitHub API by using a GitHub App or by using a personal access token (PAT). The primary benefit of using a GitHub App is increased API quota. For this project, we will use a GitHub App. Setting up the app will provide you with an "App ID" and a "Private Key, installing it on the repo will also provide you with an "App Installation ID". All these are to be added to this repo as secrets named "APP_ID", "APP_KEY", and "APP_INSTALLATION_ID" respectively.
 
 You can find the app installation ID on the app installation page, which has the following URL format:
@@ -48,4 +47,37 @@ kubectl create secret generic runner-controller-manager \
 --from-literal=github_app_private_key="${APP_KEY}"
 ```
 
+### Create Secrets and Variables
+Next, create secret and variables in this repository setting that will be used when the github actions workflow in this repo is triggered.
 
+The secret to create is:
+- KUBECONFIG: This is the path to your kube config file. This is used to connect
+
+The workflow also uses several variables:
+
+- CONTROL_NAMESPACE: The namespace for the Actions Runner Controller.
+- CONTROLLER_INSTALLATION_NAME: The name of the Actions Runner Controller installation.
+- NAMESPACE: The namespace for the actions runners.
+- RUNNERS_INSTALLATION_NAME: The name of the runners installation.
+
+### Triggers
+
+The workflow is triggered on:
+
+- Push events to the main branch.
+- Pull request events to the main branch.
+- Manual workflow dispatch (allowing users to trigger the workflow manually).
+
+### Job
+The workflow has a single job named deploy that runs on an ubuntu-latest environment.
+
+### Steps
+
+The job consists of 6 steps:
+
+- `Checkout`: Uses the actions/checkout@v4 action to check out the repository code.
+- `Install Kubectl CLI`: Uses the azure/setup-kubectl@v4 action to install the latest version of the Kubernetes CLI (kubectl).
+- `Set Kubeconfig Context`: Uses the azure/k8s-set-context@v4 action to set the Kubernetes context using a kubeconfig file stored as a secret in the repository (${secrets.KUBECONFIG}).
+- `Install Helm`: Uses the azure/setup-helm@v4.2.0 action to install Helm version 3.13.3.
+- `Install Actions Runner Controller`: Installs or upgrades the Actions Runner Controller using Helm. The script checks if the controller is already installed, and if so, upgrades it. Otherwise, it installs it. The installation uses a values file (controller/values.yaml) and a Helm chart from the ghcr.io/actions/actions-runner-controller-charts repository.
+- `Install runners`: Installs or upgrades the runners using Helm, similar to the previous step. The script checks if the runners are already installed, and if so, upgrades them. Otherwise, it installs them. The installation uses a values file (runners/values.yaml) and a Helm chart from the ghcr.io/actions/actions-runner-controller-charts repository.

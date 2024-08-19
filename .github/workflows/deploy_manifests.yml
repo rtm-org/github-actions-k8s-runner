@@ -25,19 +25,10 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
-      - name: Fetch Cluster Details
-        run: |
-          kubectl version
-          echo ----------------------------------------------------
-          kubectl get nodes
-
       - name: Install Helm
         uses: azure/setup-helm@v4.2.0
         with:
           version: v3.13.3
-
-      - name: Check Helm Version
-        run: helm version
 
       - name: Install Actions Runner Controller
         run: |
